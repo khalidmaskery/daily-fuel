@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def ciVersion = (System.getenv("VERSION_CODE") ?: "1").toInteger()
+
 android {
     namespace = "com.dailyfuel.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -8,8 +10,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // CI passes the run number so every release has a higher version code and installs as an update.
-        versionCode (System.getenv("VERSION_CODE") ?: "1").toInteger()
-        versionName "1.0." + (System.getenv("VERSION_CODE") ?: "0")
+        versionCode ciVersion
+        versionName "1.0.${ciVersion}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
