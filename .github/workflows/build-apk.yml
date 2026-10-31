@@ -36,24 +36,42 @@ jobs:
       - name: Sync web app into the Android project
         run: npx cap sync android
 
-      - name: Build debug APK
+      - name: Build APK
+        id: build
         working-directory: android
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            export KEYSTORE_PATH="$RUNNER_TEMP/release.keystore"
+            ./gradlew assembleRelease --no-daemon
+            cp app/build/outputs/apk/release/app-release.apk ../daily-fuel.apk
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Signing secrets are missing, so this build is a temporary test build and is not published as a release."
+            ./gradlew assembleDebug --no-daemon
+            cp app/build/outputs/apk/debug/app-debug.apk ../daily-fuel.apk
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
           name: daily-fuel-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: daily-fuel.apk
           if-no-files-found: error
 
-      - name: Publish the APK as a release (easy download on a phone)
+      - name: Publish the signed APK as a release
+        if: steps.build.outputs.signed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk daily-fuel.apk
           gh release create "v1.0.${{ github.run_number }}" daily-fuel.apk \
-            --title "Daily Fuel build ${{ github.run_number }}" \
-            --notes "Debug APK. Download daily-fuel.apk on your Android phone and allow installs from this source." \
+            --title "Daily Fuel 1.0.${{ github.run_number }}" \
+            --notes "Download daily-fuel.apk on your Android phone and install it over the previous version. Your data is kept." \
             --target "${{ github.sha }}"
