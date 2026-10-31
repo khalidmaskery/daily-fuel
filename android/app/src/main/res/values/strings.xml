@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Daily Fuel</string>
+    <string name="title_activity_main">Daily Fuel</string>
+    <string name="package_name">com.dailyfuel.app</string>
+    <string name="custom_url_scheme">com.dailyfuel.app</string>
+</resources>

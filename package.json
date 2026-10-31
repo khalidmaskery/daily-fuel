@@ -1,0 +1,18 @@
+{
+  "name": "daily-fuel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Daily menu, calorie and protein counter with meal and water reminders",
+  "scripts": {
+    "sync": "cap sync android",
+    "apk": "cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/local-notifications": "^8.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0"
+  }
+}

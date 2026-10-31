@@ -1,0 +1,12 @@
+{
+  "appId": "com.dailyfuel.app",
+  "appName": "Daily Fuel",
+  "webDir": "www",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#0FA89B"
+    }
+  }
+}
